@@ -511,6 +511,25 @@ mod tests {
     }
 
     #[test]
+    fn it_ignores_commented_lines() {
+        let input = r#"
+            line one
+            # line two
+        "#;
+
+        let result = string_to_table(input, true, false, 1);
+        assert_eq!(
+            result,
+            vec![
+                vec![
+                    owned("column1", "line"),
+                    owned("column2", "one")
+                ]
+            ]
+        )
+    }
+
+    #[test]
     fn test_examples() {
         use crate::test_examples;
 
