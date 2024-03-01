@@ -239,7 +239,7 @@ fn string_to_table(
     aligned_columns: bool,
     split_at: usize,
 ) -> Vec<Vec<(String, String)>> {
-    let mut lines = s.lines().filter(|l| !l.trim().is_empty());
+    let mut lines = s.lines().filter(|l| !l.trim().is_empty()).filter(|l| !l.trim().starts_with("#"));
     let separator = " ".repeat(std::cmp::max(split_at, 1));
 
     let (ls, header_options) = if noheaders {
@@ -322,7 +322,7 @@ mod tests {
             3       4
             #comment       line
         "#;
-        let result = string_to_table(input, false, false, 8);
+        let result = string_to_table(input, false, false, 1);
         assert_eq!(
             result,
             vec![
