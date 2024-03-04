@@ -1,7 +1,7 @@
 use nu_protocol::ast::Call;
 use nu_protocol::engine::{Command, EngineState, Stack};
 use nu_protocol::{Category, Example, PipelineData, ShellError, Signature, Type, Value};
-use uuid::Uuid;
+use ulid::Generator;
 
 #[derive(Clone)]
 pub struct SubCommand;
@@ -47,9 +47,10 @@ impl Command for SubCommand {
 
 fn ulid(call: &Call) -> Result<PipelineData, ShellError> {
     let span = call.head;
-    let uuid_4 = Uuid::new_v4().hyphenated().to_string();
+    let mut gen = Generator::new();
+    let new_ulid = gen.generate().unwrap();
 
-    Ok(PipelineData::Value(Value::string(uuid_4, span), None))
+    Ok(PipelineData::Value(Value::string(new_ulid, span), None))
 }
 
 #[cfg(test)]

@@ -91,6 +91,7 @@ uu_whoami = "0.0.23"
 uu_mkdir = "0.0.23"
 uu_mktemp = "0.0.23"
 uuid = { version = "1.6", features = ["v4"] }
+ulid = "1.1.2"
 v_htmlescape = "0.15.0"
 wax = { version = "0.6" }
 which = { version = "6.0", optional = true }
