@@ -88,6 +88,11 @@ impl Command for Table {
                 "expand the table structure in a light mode",
                 Some('e'),
             )
+            .switch(
+                "nocolor",
+                "render the table without colors",
+                Some('n'),
+            )
             .named(
                 "expand-deep",
                 SyntaxShape::Int,
@@ -249,9 +254,13 @@ fn parse_table_config(
     stack: &mut Stack,
 ) -> Result<TableConfig, ShellError> {
     let width_param: Option<i64> = call.get_flag(state, stack, "width")?;
+
+    let nocolor: bool = call.has_flag(state, stack, "nocolor")?;
+    dbg!(&nocolor);
     let expand: bool = call.has_flag(state, stack, "expand")?;
     let expand_limit: Option<usize> = call.get_flag(state, stack, "expand-deep")?;
     let collapse: bool = call.has_flag(state, stack, "collapse")?;
+
     let flatten: bool = call.has_flag(state, stack, "flatten")?;
     let flatten_separator: Option<String> = call.get_flag(state, stack, "flatten-separator")?;
     let abbrivation: Option<usize> = call
