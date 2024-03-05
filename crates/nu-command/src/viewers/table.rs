@@ -228,6 +228,7 @@ struct TableConfig {
     term_width: usize,
     theme: TableMode,
     abbreviation: Option<usize>,
+    nocolor: bool,
 }
 
 impl TableConfig {
@@ -237,6 +238,7 @@ impl TableConfig {
         theme: TableMode,
         abbreviation: Option<usize>,
         index: Option<usize>,
+        nocolor: bool,
     ) -> Self {
         Self {
             index,
@@ -244,6 +246,7 @@ impl TableConfig {
             term_width,
             abbreviation,
             theme,
+            nocolor,
         }
     }
 }
@@ -287,6 +290,7 @@ fn parse_table_config(
         theme,
         abbrivation,
         index,
+        nocolor,
     ))
 }
 
