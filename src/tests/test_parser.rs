@@ -552,12 +552,14 @@ fn unbalanced_delimiter4() -> TestResult {
 
 #[test]
 fn unbalanced_parens() -> TestResult {
-    fail_test(r#")"#, "unbalanced ( and )")
+    let input = r#")"#;
+    fail_test(input, "unbalanced ( and )")
 }
 
 #[test]
 fn balanced_parens() -> TestResult {
-    run_test(r#"")""#, ")")
+    let input = r#"")""#;
+    run_test(input, ")")
 }
 
 #[test]
