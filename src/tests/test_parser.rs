@@ -551,6 +551,18 @@ fn unbalanced_delimiter4() -> TestResult {
 }
 
 #[test]
+fn unbalanced_parens() -> TestResult {
+    let input = r#")"#;
+    fail_test(input, "unbalanced ( and )")
+}
+
+#[test]
+fn balanced_parens() -> TestResult {
+    let input = r#"")""#;
+    run_test(input, ")")
+}
+
+#[test]
 fn register_with_string_literal() -> TestResult {
     fail_test(r#"register 'nu-plugin-math'"#, "File not found")
 }
