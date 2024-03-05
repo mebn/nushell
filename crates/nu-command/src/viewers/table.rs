@@ -259,7 +259,7 @@ fn parse_table_config(
     let width_param: Option<i64> = call.get_flag(state, stack, "width")?;
 
     let nocolor: bool = call.has_flag(state, stack, "nocolor")?;
-    dbg!(&nocolor);
+    // dbg!(&nocolor);
     let expand: bool = call.has_flag(state, stack, "expand")?;
     let expand_limit: Option<usize> = call.get_flag(state, stack, "expand-deep")?;
     let collapse: bool = call.has_flag(state, stack, "collapse")?;
@@ -852,7 +852,13 @@ impl Iterator for PagingTableCreator {
         self.row_offset += batch_size;
 
         let config = get_config(&self.engine_state, &self.stack);
-        convert_table_to_output(table, &config, &self.ctrlc, self.cfg.term_width)
+        convert_table_to_output(
+            table,
+            &config,
+            &self.ctrlc,
+            self.cfg.term_width,
+            self.cfg.nocolor,
+        )
     }
 }
 
@@ -1044,10 +1050,15 @@ fn convert_table_to_output(
     config: &Config,
     ctrlc: &Option<Arc<AtomicBool>>,
     term_width: usize,
+    nocolor: bool,
 ) -> Option<Result<Vec<u8>, ShellError>> {
     match table {
         Ok(Some(table)) => {
-            let table = maybe_strip_color(table, config);
+            let table = if nocolor {
+                nu_utils::strip_ansi_string_likely(table)
+            } else {
+                maybe_strip_color(table, config)
+            };
 
             let mut bytes = table.as_bytes().to_vec();
             bytes.push(b'\n'); // nu-table tables don't come with a newline on the end
