@@ -324,14 +324,17 @@ pub fn parse_external_call(
 
     let head = if head_contents.starts_with(b"$") || head_contents.starts_with(b"(") {
         // the expression is inside external_call, so it's a subexpression
+        trace!("head");
         let arg = parse_expression(working_set, &[head_span], true);
         Box::new(arg)
     } else {
+        trace!("else");
         let (contents, err) = unescape_unquote_string(&head_contents, head_span);
         if let Some(err) = err {
             working_set.error(err)
         }
 
+        trace!("{}", contents);
         Box::new(Expression {
             expr: Expr::String(contents),
             span: head_span,
@@ -1478,6 +1481,7 @@ pub fn parse_range(working_set: &mut StateWorkingSet, span: Span) -> Expression 
     //bugbug range cannot be [..] because that looks like parent directory
 
     let contents = working_set.get_span_contents(span);
+    trace!("range: {:?}", contents);
 
     let token = if let Ok(s) = String::from_utf8(contents.into()) {
         s
@@ -1637,6 +1641,7 @@ pub fn parse_paren_expr(
     let starting_error_count = working_set.parse_errors.len();
 
     let expr = parse_range(working_set, span);
+    trace!("parsing paren: {:?}", expr);
 
     if starting_error_count == working_set.parse_errors.len() {
         expr
@@ -1679,11 +1684,15 @@ pub fn parse_brace_expr(
         .first()
         .map(|token| working_set.get_span_contents(token.span));
 
+    trace!("token2: {:?}", second_token);
+
     let second_token_contents = tokens.first().map(|token| token.contents);
 
     let third_token = tokens
         .get(1)
         .map(|token| working_set.get_span_contents(token.span));
+
+    trace!("token3: {:?}", third_token);
 
     if second_token.is_none() {
         // If we're empty, that means an empty record or closure
@@ -1731,6 +1740,7 @@ pub fn parse_string_interpolation(working_set: &mut StateWorkingSet, span: Span)
         Expression,
     }
 
+    trace!("parse string interpolation");
     let contents = working_set.get_span_contents(span);
 
     let mut double_quote = false;
@@ -1794,6 +1804,7 @@ pub fn parse_string_interpolation(working_set: &mut StateWorkingSet, span: Span)
                     if let Some(err) = err {
                         working_set.error(err);
                     }
+                    trace!("{}", String::from_utf8_lossy(&str_contents).to_string());
 
                     output.push(Expression {
                         expr: Expr::String(String::from_utf8_lossy(&str_contents).to_string()),
@@ -2094,6 +2105,7 @@ pub fn parse_full_cell_path(
             let span = Span::new(start, end);
 
             let source = working_set.get_span_contents(span);
+            trace!("{:?}", source);
 
             let (output, err) = lex(source, span.start, &[b'\n', b'\r'], &[], true);
             if let Some(err) = err {
@@ -2700,14 +2712,17 @@ pub fn parse_string(working_set: &mut StateWorkingSet, span: Span) -> Expression
 
     // Check for bare word interpolation
     if bytes[0] != b'\'' && bytes[0] != b'"' && bytes[0] != b'`' && bytes.contains(&b'(') {
+        trace!("bareword interpolation");
         return parse_string_interpolation(working_set, span);
     }
 
     let (s, err) = unescape_unquote_string(bytes, span);
     if let Some(err) = err {
+        trace!("some error");
         working_set.error(err);
     }
 
+    trace!("return expression");
     Expression {
         expr: Expr::String(s),
         span,
@@ -2770,6 +2785,7 @@ pub fn parse_string_strict(working_set: &mut StateWorkingSet, span: Span) -> Exp
 
             garbage(span)
         } else {
+            trace!("else {}", token);
             Expression {
                 expr: Expr::String(token),
                 span,
