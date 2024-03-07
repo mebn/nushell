@@ -1101,3 +1101,39 @@ fn supported_table_modes() -> Vec<Value> {
         Value::test_string("basic_compact"),
     ]
 }
+
+#[cfg(test)]
+mod tests {
+    use super::convert_table_to_output;
+    use nu_protocol::Config;
+
+    #[test]
+    fn test_table_color() {
+        let table = "\u{1b}[37m╭───┬───╮\u{1b}[0m\n\u{1b}[37m│\u{1b}[0m \u{1b}[1;32m0\u{1b}[0m \u{1b}[37m│\u{1b}[0m \u{1b}[37ma\u{1b}[0m \u{1b}[37m│\u{1b}[0m\n\u{1b}[37m│\u{1b}[0m \u{1b}[1;32m1\u{1b}[0m \u{1b}[37m│\u{1b}[0m \u{1b}[37mb\u{1b}[0m \u{1b}[37m│\u{1b}[0m\n\u{1b}[37m╰───┴───╯\u{1b}[0m";
+
+        let res = convert_table_to_output(
+            Ok(Some(table.to_string())),
+            &Config::default(),
+            &None,
+            80,
+            false,
+        ).unwrap().unwrap();
+
+        assert_eq!(res, format!("{table}\n").as_bytes().to_vec());
+    }
+
+    #[test]
+    fn test_table_nocolor() {
+        let table = "\u{1b}[37m╭───┬───╮\u{1b}[0m\n\u{1b}[37m│\u{1b}[0m \u{1b}[1;32m0\u{1b}[0m \u{1b}[37m│\u{1b}[0m \u{1b}[37ma\u{1b}[0m \u{1b}[37m│\u{1b}[0m\n\u{1b}[37m│\u{1b}[0m \u{1b}[1;32m1\u{1b}[0m \u{1b}[37m│\u{1b}[0m \u{1b}[37mb\u{1b}[0m \u{1b}[37m│\u{1b}[0m\n\u{1b}[37m╰───┴───╯\u{1b}[0m";
+
+        let res = convert_table_to_output(
+            Ok(Some(table.to_string())),
+            &Config::default(),
+            &None,
+            80,
+            true,
+        ).unwrap().unwrap();
+
+        assert_eq!(res, format!("╭───┬───╮\n│ 0 │ a │\n│ 1 │ b │\n╰───┴───╯\n").as_bytes().to_vec());
+    }
+}
