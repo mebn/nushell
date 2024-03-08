@@ -257,13 +257,10 @@ fn parse_table_config(
     stack: &mut Stack,
 ) -> Result<TableConfig, ShellError> {
     let width_param: Option<i64> = call.get_flag(state, stack, "width")?;
-
     let nocolor: bool = call.has_flag(state, stack, "nocolor")?;
-    // dbg!(&nocolor);
     let expand: bool = call.has_flag(state, stack, "expand")?;
     let expand_limit: Option<usize> = call.get_flag(state, stack, "expand-deep")?;
     let collapse: bool = call.has_flag(state, stack, "collapse")?;
-
     let flatten: bool = call.has_flag(state, stack, "flatten")?;
     let flatten_separator: Option<String> = call.get_flag(state, stack, "flatten-separator")?;
     let abbrivation: Option<usize> = call
@@ -1117,7 +1114,9 @@ mod tests {
             &None,
             80,
             false,
-        ).unwrap().unwrap();
+        )
+        .unwrap()
+        .unwrap();
 
         assert_eq!(res, format!("{table}\n").as_bytes().to_vec());
     }
@@ -1132,8 +1131,15 @@ mod tests {
             &None,
             80,
             true,
-        ).unwrap().unwrap();
+        )
+        .unwrap()
+        .unwrap();
 
-        assert_eq!(res, format!("╭───┬───╮\n│ 0 │ a │\n│ 1 │ b │\n╰───┴───╯\n").as_bytes().to_vec());
+        assert_eq!(
+            res,
+            format!("╭───┬───╮\n│ 0 │ a │\n│ 1 │ b │\n╰───┴───╯\n")
+                .as_bytes()
+                .to_vec()
+        );
     }
 }
